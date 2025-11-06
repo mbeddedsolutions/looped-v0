@@ -1,30 +1,24 @@
 const express = require("express");
 const router = express.Router();
+const db = require("../db");
 
-let calls = [
-  {
-    id: "101",
-    phone_id: "1",
-    contact_name: "Maddy Dweck",
-    duration: "2m 15s",
-    call_date: new Date(Date.now() - 5 * 60 * 1000).toISOString(),
-  },
-  {
-    id: "102",
-    phone_id: "1",
-    contact_name: "Sim Dim",
-    duration: "1m 45s",
-    call_date: new Date(Date.now() - 15 * 60 * 1000).toISOString(),
-  },
-  {
-    id: "103",
-    phone_id: "2",
-    contact_name: "Buster",
-    duration: "3m 20s",
-    call_date: new Date(Date.now() - 30 * 60 * 1000).toISOString(),
-  },
-];
+router.get("/", (req, res) => {
+  db.all("SELECT * FROM calls", [], (err, rows) => {
+    if (err) return res.status(500).json({ error: err.message });
+    res.json(rows);
+  });
+});
 
-router.get("/", (req, res) => res.json(calls));
+router.post("/", (req, res) => {
+  const { phone_id, contact_name, duration, call_date } = req.body;
+  db.run(
+    "INSERT INTO calls(phone_id, contact_name, duration, call_date) VALUES(?, ?, ?, ?)",
+    [phone_id, contact_name, duration, call_date],
+    function (err) {
+      if (err) return res.status(500).json({ error: err.message });
+      res.json({ id: this.lastID, phone_id, contact_name, duration, call_date });
+    }
+  );
+});
 
 module.exports = router;

@@ -1,13 +1,20 @@
 const express = require("express");
 const router = express.Router();
+const db = require("../db");
 
-let phones = [
-  { id: "1", name: "Home Phone" },
-  { id: "2", name: "Office Line" },
-  { id: "3", name: "Jared's Phone"},
-   { id: "4", name: "Jack's Phone"},
-];
+router.get("/", (req, res) => {
+  db.all("SELECT * FROM phones", [], (err, rows) => {
+    if (err) return res.status(500).json({ error: err.message });
+    res.json(rows);
+  });
+});
 
-router.get("/", (req, res) => res.json(phones));
+router.post("/", (req, res) => {
+  const { name } = req.body;
+  db.run("INSERT INTO phones(name) VALUES(?)", [name], function (err) {
+    if (err) return res.status(500).json({ error: err.message });
+    res.json({ id: this.lastID, name });
+  });
+});
 
 module.exports = router;
