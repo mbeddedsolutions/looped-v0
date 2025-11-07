@@ -1,4 +1,4 @@
-const API_BASE = "http://localhost:3000/api";
+const API_BASE = "http://looped.local:3000/api";
 
 // -------------------- Contacts --------------------
 export const Contact = {
